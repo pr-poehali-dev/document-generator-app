@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Фон -->
+  <rect width="512" height="512" rx="112" fill="#080e1a"/>
+  <!-- Градиент золото -->
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d4a017"/>
+      <stop offset="100%" stop-color="#f5cc5a"/>
+    </linearGradient>
+  </defs>
+  <!-- Документ -->
+  <rect x="148" y="100" width="216" height="280" rx="18" fill="url(#gold)" opacity="0.15"/>
+  <rect x="148" y="100" width="216" height="280" rx="18" fill="none" stroke="url(#gold)" stroke-width="12"/>
+  <!-- Строки текста -->
+  <rect x="180" y="172" width="152" height="14" rx="7" fill="url(#gold)"/>
+  <rect x="180" y="208" width="120" height="12" rx="6" fill="url(#gold)" opacity="0.6"/>
+  <rect x="180" y="240" width="136" height="12" rx="6" fill="url(#gold)" opacity="0.6"/>
+  <rect x="180" y="272" width="96" height="12" rx="6" fill="url(#gold)" opacity="0.4"/>
+  <!-- Галочка / подпись -->
+  <circle cx="256" cy="362" r="36" fill="url(#gold)"/>
+  <polyline points="238,362 250,374 274,350" fill="none" stroke="#080e1a" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
