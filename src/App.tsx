@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Icon from "@/components/ui/icon";
+import { useIsMobile } from "@/hooks/use-mobile";
 import Dashboard from "./pages/Dashboard";
 import Constructor from "./pages/Constructor";
 import Templates from "./pages/Templates";
@@ -15,6 +16,14 @@ import Profile from "./pages/Profile";
 const queryClient = new QueryClient();
 
 const navItems = [
+  { id: "dashboard", label: "Главная", icon: "LayoutDashboard" },
+  { id: "constructor", label: "Создать", icon: "FilePlus" },
+  { id: "documents", label: "Документы", icon: "Files" },
+  { id: "clients", label: "Клиенты", icon: "Users" },
+  { id: "bank", label: "Банк", icon: "Landmark" },
+];
+
+const allNavItems = [
   { id: "dashboard", label: "Главная", icon: "LayoutDashboard" },
   { id: "constructor", label: "Конструктор", icon: "FilePlus" },
   { id: "templates", label: "Шаблоны", icon: "Library" },
@@ -33,10 +42,100 @@ const pageMap: Record<string, React.ReactNode> = {
   profile: <Profile />,
 };
 
+const allPages = [...allNavItems, { id: "profile", label: "Профиль", icon: "User" }];
+
 function AppLayout() {
   const [page, setPage] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
+  const isMobile = useIsMobile();
 
+  const currentLabel = allPages.find(n => n.id === page)?.label ?? "";
+
+  if (isMobile) {
+    return (
+      <div className="flex flex-col h-[100dvh] overflow-hidden bg-background">
+        {/* Mobile Top Bar */}
+        <header
+          className="shrink-0 flex items-center justify-between px-4 border-b border-white/5"
+          style={{ background: "hsl(var(--sidebar-background))", paddingTop: "env(safe-area-inset-top)", height: "calc(56px + env(safe-area-inset-top))" }}
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 gradient-gold rounded-xl flex items-center justify-center shrink-0">
+              <Icon name="FileSignature" size={15} className="text-background" />
+            </div>
+            <div>
+              <div className="font-montserrat font-black text-sm gradient-text leading-tight">ДокуПро</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="w-9 h-9 glass rounded-xl flex items-center justify-center relative">
+              <Icon name="Bell" size={16} className="text-muted-foreground" />
+              <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-primary" />
+            </button>
+            <button
+              onClick={() => setPage("profile")}
+              className={`w-9 h-9 rounded-xl flex items-center justify-center font-montserrat font-bold text-xs text-background ${page === "profile" ? "gradient-gold" : "glass"}`}
+            >
+              ИИ
+            </button>
+          </div>
+        </header>
+
+        {/* Page Title */}
+        <div className="shrink-0 px-4 pt-4 pb-2">
+          <h1 className="text-xl font-montserrat font-bold">{currentLabel}</h1>
+        </div>
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto px-4 pb-4">
+          <div key={page} className="animate-fade-in">
+            {pageMap[page]}
+          </div>
+        </div>
+
+        {/* Mobile Bottom Nav */}
+        <nav
+          className="shrink-0 border-t border-white/5 grid grid-cols-5"
+          style={{
+            background: "hsl(var(--sidebar-background))",
+            paddingBottom: "env(safe-area-inset-bottom)",
+          }}
+        >
+          {navItems.map((item) => {
+            const isActive = page === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setPage(item.id)}
+                className="flex flex-col items-center justify-center gap-1 py-3 transition-all duration-200 relative"
+              >
+                {isActive && (
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 gradient-gold rounded-full" />
+                )}
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${
+                  isActive ? "glass-gold" : ""
+                }`}>
+                  <Icon
+                    name={item.icon}
+                    size={20}
+                    className={isActive ? "text-primary" : "text-muted-foreground"}
+                    fallback="Circle"
+                  />
+                </div>
+                <span className={`text-[10px] font-medium leading-none ${
+                  isActive ? "text-primary" : "text-muted-foreground"
+                }`}>
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+    );
+  }
+
+  // Desktop Layout
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Sidebar */}
@@ -61,7 +160,7 @@ function AppLayout() {
 
         {/* Nav */}
         <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-          {navItems.map((item) => (
+          {allNavItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setPage(item.id)}
@@ -83,7 +182,7 @@ function AppLayout() {
             onClick={() => setPage("profile")}
             className={`nav-item w-full ${page === "profile" ? "active" : ""} ${collapsed ? "justify-center px-2" : ""}`}
           >
-            <div className={`w-7 h-7 gradient-gold rounded-lg flex items-center justify-center shrink-0 text-xs font-montserrat font-bold text-background`}>
+            <div className="w-7 h-7 gradient-gold rounded-lg flex items-center justify-center shrink-0 text-xs font-montserrat font-bold text-background">
               ИИ
             </div>
             {!collapsed && (
@@ -106,14 +205,14 @@ function AppLayout() {
       {/* Main */}
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Top Bar */}
-        <header className="shrink-0 h-14 border-b border-white/5 flex items-center justify-between px-6"
-          style={{ background: "hsl(var(--sidebar-background))" }}>
+        <header
+          className="shrink-0 h-14 border-b border-white/5 flex items-center justify-between px-6"
+          style={{ background: "hsl(var(--sidebar-background))" }}
+        >
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>ДокуПро</span>
             <Icon name="ChevronRight" size={14} />
-            <span className="text-foreground font-medium">
-              {[...navItems, { id: "profile", label: "Профиль", icon: "User" }].find(n => n.id === page)?.label}
-            </span>
+            <span className="text-foreground font-medium">{currentLabel}</span>
           </div>
           <div className="flex items-center gap-3">
             <button className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-white/8 transition-colors relative">
