@@ -12,6 +12,9 @@ import Documents from "./pages/Documents";
 import Clients from "./pages/Clients";
 import Bank from "./pages/Bank";
 import Profile from "./pages/Profile";
+import Landing from "./pages/Landing";
+import Knowledge from "./pages/Knowledge";
+import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
@@ -44,12 +47,42 @@ const pageMap: Record<string, React.ReactNode> = {
 
 const allPages = [...allNavItems, { id: "profile", label: "Профиль", icon: "User" }];
 
+type Screen = "landing" | "knowledge" | "auth" | "app";
+
 function AppLayout() {
+  const [screen, setScreen] = useState<Screen>("landing");
   const [page, setPage] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
   const isMobile = useIsMobile();
 
   const currentLabel = allPages.find(n => n.id === page)?.label ?? "";
+
+  if (screen === "landing") {
+    return (
+      <Landing
+        onKnowledge={() => setScreen("knowledge")}
+        onLogin={() => setScreen("auth")}
+      />
+    );
+  }
+
+  if (screen === "knowledge") {
+    return (
+      <Knowledge
+        onBack={() => setScreen("landing")}
+        onLogin={() => setScreen("auth")}
+      />
+    );
+  }
+
+  if (screen === "auth") {
+    return (
+      <Auth
+        onBack={() => setScreen("landing")}
+        onSuccess={() => setScreen("app")}
+      />
+    );
+  }
 
   if (isMobile) {
     return (
